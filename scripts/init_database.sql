@@ -8,7 +8,10 @@ If the Database exists, it is dropped and recreated. Additionally, the scripy se
 within the database: 'bronze', 'silver' and gold'.
 
 WARNING;
-Running this script will drop the en
+Running this script will drop the entire 'DataWarehouse' database if it exists. In other words,
+ALL data in database will be permanently deleted. 
+
+PROCEED with caution + have proper backups before running script
 
 */
 
@@ -27,3 +30,17 @@ GO
 -- Create the 'DataWarehouse' database
 CREATE DATABASE DataWarehouse;
 GO
+
+USE DataWarehouse
+GO
+
+-- Create Schemas
+CREATE SCHEMA bronze;
+GO
+    
+CREATE SCHEMA silver;
+GO
+    
+CREATE SCHEMA gold;
+GO
+
