@@ -1,0 +1,171 @@
+---
+title: "Data Management for the 
+     National Epidemiologic Survey on Alcohol and Related Conditions Data Set"
+author: "Durge Kumar"
+format:
+  html: default
+  pdf: default
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Import
+
+```{r}
+# Load libraries
+library(tidyverse)
+
+# Read in the data 
+#raw <- read.delim(here::here("data/Depress.txt")) # change this line to read in YOUR data set
+load(here::here("data/nesarc_rdata.Rdata"))
+```
+
+# Restrict to analysis variables
+
+Select only the variables that I am interested in
+
+```{r}
+my_data  <- raw %>% 
+  janitor::clean_names() %>%
+  select(age, doby, sex, s9q21hr)
+
+```
+
+# Clean
+
+## Categorical variable 1: Sex
+
+Description: 
+This variable identifies the biologically sex of respondent, 
+either male or female.
+
+```{r}
+# use the class() or str() function to identify the data type
+
+class(my_data$sex)
+
+```
+
+Does this match with the intended data type?
+Yes
+
+```{r}
+# create a table() of the data to check for out of range variables
+
+#table(), summary() and hist()
+my_data$sex <- factor(my_data$sex, labels=c("Male", "Female"))
+#table(my_data$sex)
+table(my_data$sex, my_data$sex, useNA="always")
+
+```
+
+write a sentence here explaining if there are any out of range variables:
+
+There are no out of range variables as the sum (43093) matches 
+with the total number of male (18518) + female(24575). 
+
+## Categorical variable 2: s9q21hr
+
+Description: 
+Asks if only/all episodes of generalized anxiety prior to last 12 months
+is related to illness. 
+
+
+```{r}
+# use the class() or str() function to identify the data type
+
+class(my_data$s9q21hr)
+```
+
+Does this match with the intended data type?
+Yes
+
+```{r}
+# create a table() of the data to check for out of range variables
+
+table(my_data$s9q21hr)
+
+my_data$s9q21hr <- factor(my_data$s9q21hr, labels=c("Yes", "No", "Unknown"))
+#table(my_data$sex)
+table(my_data$s9q21hr, my_data$s9q21hr, useNA="always")
+
+```
+
+write a sentence here explaining if there are any out of range variables
+
+There are no any out of range variables as the values match the codebook as 
+well as add up the the sum of 43093.
+
+## Quantitative variable 1: Age
+
+Description: The age of the respondent 
+
+```{r}
+# use the class() or str() function to identify the data type
+class(my_data$age)
+
+```
+
+Does this match with the intended data type?
+Yes
+
+```{r}
+# create a summary() of the data to check for out of range variables
+summary(my_data$age)
+
+# create a hist() histogram of the data to check for severe skewness
+hist(my_data$age)
+
+my_data$age_group<- ifelse(my_data$age >= 18 & my_data$age <= 98,
+                      "ages between 18 and 98", NA) 
+table(my_data$age_group, useNA="always")
+```
+
+There are no out of range variables as there are no values outside (<NA>).
+In other words, all the data is in the range from min (18) to max (98).
+The sum equals the total amount of objects(43093).
+
+## Quantitative variable 2: DOBY
+
+Description: Date of Birth Year of respondent. 
+
+```{r}
+# use the class() or str() function to identify the data type
+
+class(my_data$doby)
+
+```
+
+Does this match with the intended data type?
+Yes
+
+```{r}
+# create a summary() of the data to check for out of range variables
+
+summary(my_data$doby)
+# create a hist() histogram of the data to check for severe skewness
+
+hist(my_data$doby)
+
+my_data$doby_group<- ifelse(my_data$doby >= 1894 & my_data$doby <= 1984,
+                      "born between 1895 and 1984", NA) 
+table(my_data$doby_group, useNA="always")
+```
+
+There are no out of range variables as there are no values outside (<NA>).
+In other words, all the data is in the range from 
+min year (1895) to max year(1984).
+The sum equals the total amount of objects(43093).
+
+# Export cleaned data set
+
+Keep only selected variables and save to an external file
+
+```{r}
+clean <- my_data %>% 
+  select(age, doby, sex, s9q21hr)
+
+save(clean, file=here::here("data/Alcohol and Related Conditions_clean.Rdata")) # change this line to use the name of YOUR data set (you are not analyzing depression)
+```
